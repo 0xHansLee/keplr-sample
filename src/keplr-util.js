@@ -1,5 +1,9 @@
 import { SigningCosmosClient } from '@cosmjs/launchpad';
 
+const chainId = 'hansol-panacea';
+const rpcUri = 'http://127.0.0.1:26657';
+const restUri = 'http://127.0.0.1:1317';
+
 export const keplr = {
   getAccount: async () => {
     if (!window.getOfflineSigner || !window.keplr) {
@@ -15,19 +19,19 @@ export const keplr = {
           // If the same chain id is already registered, it will resolve and not require the user interactions.
           await window.keplr.experimentalSuggestChain({
             // Chain-id of the Cosmos SDK chain.
-            chainId: 'cosmoshub-3',
+            chainId,
             // The name of the chain to be displayed to the user.
-            chainName: 'Cosmos',
+            chainName: 'local panacea',
             // RPC endpoint of the chain.
-            rpc: 'https://node-cosmoshub-3.keplr.app/rpc',
+            rpc: rpcUri,
             // REST endpoint of the chain.
-            rest: 'https://node-cosmoshub-3.keplr.app/rest',
+            rest: restUri,
             // Staking coin information
             stakeCurrency: {
               // Coin denomination to be displayed to the user.
-              coinDenom: 'ATOM',
+              coinDenom: 'MED',
               // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-              coinMinimalDenom: 'uatom',
+              coinMinimalDenom: 'umed',
               // # of decimal points to convert minimal denomination to user-facing denomination.
               coinDecimals: 6,
               // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -54,20 +58,20 @@ export const keplr = {
             //   bech32PrefixConsPub: string;
             // }
             bech32Config: {
-              bech32PrefixAccAddr: 'cosmos',
-              bech32PrefixAccPub: 'cosmospub',
-              bech32PrefixValAddr: 'cosmosvaloper',
-              bech32PrefixValPub: 'cosmosvaloperpub',
-              bech32PrefixConsAddr: 'cosmosvalcons',
-              bech32PrefixConsPub: 'cosmosvalconspub',
+              bech32PrefixAccAddr: 'panacea',
+              bech32PrefixAccPub: 'panaceapub',
+              bech32PrefixValAddr: 'panaceavaloper',
+              bech32PrefixValPub: 'panaceavaloperpub',
+              bech32PrefixConsAddr: 'panaceavalcons',
+              bech32PrefixConsPub: 'panaceavalconspub',
             },
             // List of all coin/tokens used in this chain.
             currencies: [
               {
                 // Coin denomination to be displayed to the user.
-                coinDenom: 'ATOM',
+                coinDenom: 'MED',
                 // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                coinMinimalDenom: 'uatom',
+                coinMinimalDenom: 'umed',
                 // # of decimal points to convert minimal denomination to user-facing denomination.
                 coinDecimals: 6,
                 // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -79,9 +83,9 @@ export const keplr = {
             feeCurrencies: [
               {
                 // Coin denomination to be displayed to the user.
-                coinDenom: 'ATOM',
+                coinDenom: 'MED',
                 // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                coinMinimalDenom: 'uatom',
+                coinMinimalDenom: 'umed',
                 // # of decimal points to convert minimal denomination to user-facing denomination.
                 coinDecimals: 6,
                 // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -113,16 +117,17 @@ export const keplr = {
       }
     }
 
-    const chainId = 'cosmoshub-3';
-
     // You should request Keplr to enable the wallet.
     // This method will ask the user whether or not to allow access if they haven't visited this website.
     // Also, it will request user to unlock the wallet if the wallet is locked.
     // If you don't request enabling before usage, there is no guarantee that other methods will work.
-    await window.keplr.enable(chainId);
+    try {
+      await window.keplr.enable(chainId);
+    } catch {
+      alert('something is wrong');
+    }
 
     const offlineSigner = window.getOfflineSigner(chainId);
-
     // You can get the address/public keys by `getAccounts` method.
     // It can return the array of address/public key.
     // But, currently, Keplr extension manages only one address/public key pair.
@@ -141,7 +146,7 @@ export const keplr = {
     amount *= 1000000;
     amount = Math.floor(amount);
 
-    const chainId = 'cosmoshub-3';
+    const chainId = 'hansol-panacea';
     await window.keplr.enable(chainId);
     const offlineSigner = window.getOfflineSigner(chainId);
 
@@ -149,7 +154,7 @@ export const keplr = {
 
     // Initialize the gaia api with the offline signer that is injected by Keplr extension.
     const cosmJs = new SigningCosmosClient(
-      'https://node-cosmoshub-3.keplr.app/rest',
+      restUri,
       accounts[0].address,
       offlineSigner
     );
@@ -158,12 +163,12 @@ export const keplr = {
     try {
       result = await cosmJs.sendTokens(recipient, [
         {
-          denom: 'uatom',
+          denom: 'umed',
           amount: amount.toString(),
         },
       ]);
     } catch (e) {
-      console.log(e);
+      console.log({ e });
     }
 
     console.log({ result });
